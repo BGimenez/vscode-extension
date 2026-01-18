@@ -1,0 +1,70 @@
+{
+  "name": "emr-developer-cortex",
+  "owner": {
+    "name": "Philips EMR Team",
+    "url": "https://github.com/philips-internal"
+  },
+  "collections": [
+	{
+	  "name": "azure-collection",
+	  "description": "Collection of plugins for Azure DevOps",
+	  "version": "1.0.0",
+	  "author": {
+		"name": "Philips EMR Team"
+	  },
+	  "license": "MIT",
+	  "source": "./collections/azure"
+	}
+  ],
+  "plugins": [
+    {
+      "name": "azure",
+      "description": "Azure DevOps integration - work items and pipelines management",
+      "version": "1.0.0",
+      "tags": [
+        "azure-devops",
+        "work-items",
+        "pipelines",
+        "enterprise"
+      ],
+      "author": {
+        "name": "Philips EMR Team"
+      },
+      "source": "./plugins/azure",
+      "license": "MIT"
+    },
+    {
+      "name": "github",
+      "description": "GitHub integration - pull requests and repository management",
+      "version": "1.0.0",
+      "tags": [
+        "github",
+        "pull-requests",
+        "repository"
+      ],
+      "author": {
+        "name": "Philips EMR Team"
+      },
+      "source": "./plugins/github",
+      "license": "MIT"
+    },
+    {
+      "name": "java",
+      "description": "Java code quality tools - SonarQube, Checkstyle, and Fortify integration",
+      "version": "1.0.0",
+      "tags": [
+        "java",
+        "sonarqube",
+        "checkstyle",
+        "fortify",
+        "security",
+        "code-quality"
+      ],
+      "author": {
+        "name": "Philips EMR Team"
+      },
+      "source": "./plugins/java",
+      "license": "MIT"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+id: azure-collection
+name: Azure DevOps Development
+description: "Comprehensive Azure cloud development tools including Infrastructure as Code, serverless functions, architecture patterns, and cost optimization for building scalable cloud applications."
+tags: [
+    azure,
+    cloud,
+    infrastructure,
+    bicep,
+    terraform,
+    serverless,
+    architecture,
+    devops,
+  ]
+items:
+  - path: prompts/azure.prompt.md
+    kind: prompt
+  - path: prompts/azure.agent.md
+    kind: agent
+  - path: prompts/azure.instructions.md
+    kind: instruction
+  - path: prompts/azure/skill.md
+    kind: skill
+  - path: mcp/azure-mcp.md
+    kind: mcp

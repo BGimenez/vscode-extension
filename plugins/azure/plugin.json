@@ -1,0 +1,31 @@
+{
+  "name": "azure",
+  "description": "Azure DevOps integration - work item management (Features, User Stories, Tasks, Bugs)",
+  "version": "1.0.0",
+  "author": {
+    "name": "Philips EMR Team"
+  },
+  "license": "MIT",
+  "contents": [
+	{
+	  "type": "prompt",
+	  "source": "path/to/prompt",
+	  "target": "prompt.md"
+	},
+	{
+	  "type": "agent",
+	  "source": "path/to/agent",
+	  "target": "agent.md"
+	},
+	{
+	  "type": "skill",
+	  "source": "path/to/skill",
+	  "target": "skill.md"
+	},
+	{
+	  "type": "mcp",
+	  "source": "path/to/workflow",
+	  "target": "workflow.json"
+	}
+  ]
+}

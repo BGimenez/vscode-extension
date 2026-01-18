@@ -1,0 +1,152 @@
+{
+  "name": "vscode-github-markdown-viewer",
+  "displayName": "GitHub Markdown Viewer",
+  "description": "Exibe arquivos .md de repositórios GitHub em Tree View, com pré-visualização e download.",
+  "version": "0.0.1",
+  "publisher": "extensao-cortex",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:githubMarkdownViewer",
+    "onCommand:githubMarkdownViewer.refresh",
+    "onCommand:githubMarkdownViewer.configureRepository",
+    "onCommand:githubMarkdownViewer.configureBasePath",
+    "onCommand:githubMarkdownViewer.configureDownloadPath",
+    "onCommand:githubMarkdownViewer.listRepositories",
+    "onCommand:githubMarkdownViewer.previewFile",
+    "onCommand:githubMarkdownViewer.downloadFile",
+    "onCommand:githubMarkdownViewer.downloadPlugin"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "githubMarkdownViewer",
+          "name": "GitHub Markdown Viewer"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "githubMarkdownViewer.refresh",
+        "title": "GitHub Markdown Viewer: Refresh"
+      },
+      {
+        "command": "githubMarkdownViewer.configureRepository",
+        "title": "GitHub Markdown Viewer: Configurar Repositórios"
+      },
+      {
+        "command": "githubMarkdownViewer.configureBasePath",
+        "title": "GitHub Markdown Viewer: Configurar Pasta Base"
+      },
+      {
+        "command": "githubMarkdownViewer.configureDownloadPath",
+        "title": "GitHub Markdown Viewer: Configurar Diretório de Download"
+      },
+      {
+        "command": "githubMarkdownViewer.listRepositories",
+        "title": "GitHub Markdown Viewer: Listar Repositórios"
+      },
+      {
+        "command": "githubMarkdownViewer.previewFile",
+        "title": "GitHub Markdown Viewer: Pré-visualizar Arquivo"
+      },
+      {
+        "command": "githubMarkdownViewer.downloadFile",
+        "title": "GitHub Markdown Viewer: Baixar Arquivo"
+      },
+      {
+        "command": "githubMarkdownViewer.downloadPlugin",
+        "title": "GitHub Markdown Viewer: Baixar Plugin"
+      }
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "githubMarkdownViewer.previewFile",
+          "when": "view == githubMarkdownViewer && viewItem == file",
+          "group": "inline"
+        },
+        {
+          "command": "githubMarkdownViewer.downloadFile",
+          "when": "view == githubMarkdownViewer && viewItem == file",
+          "group": "inline"
+        },
+        {
+          "command": "githubMarkdownViewer.downloadPlugin",
+          "when": "view == githubMarkdownViewer && viewItem == plugin",
+          "group": "inline"
+        },
+        {
+          "command": "githubMarkdownViewer.refresh",
+          "when": "view == githubMarkdownViewer",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "GitHub Markdown Viewer",
+      "properties": {
+        "githubMarkdownViewer.repositories": {
+          "type": "array",
+          "default": [],
+          "description": "Lista de repositórios configurados",
+          "items": {
+            "type": "object",
+            "properties": {
+              "owner": {
+                "type": "string"
+              },
+              "repo": {
+                "type": "string"
+              },
+              "token": {
+                "type": "string"
+              },
+              "basePath": {
+                "type": "string"
+              },
+              "downloadPath": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "owner",
+              "repo"
+            ]
+          }
+        },
+        "githubMarkdownViewer.defaultBasePath": {
+          "type": "string",
+          "default": "eng",
+          "description": "Pasta base padrão para listagem."
+        },
+        "githubMarkdownViewer.defaultDownloadPath": {
+          "type": "string",
+          "default": "./downloads",
+          "description": "Diretório padrão para download."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.0",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.0.0",
+    "js-yaml": "^4.1.0"
+  }
+}

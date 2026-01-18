@@ -1,0 +1,149 @@
+import { Octokit } from '@octokit/rest';
+import { RepositoryNode } from '../models/Repository';
+import { MarketplaceFile } from '../models/Marketplace';
+import { parseMarketplace } from '../utils/marketplaceParser';
+
+export interface GitHubFileEntry {
+  name: string;
+  path: string;
+  type: 'file' | 'dir';
+  download_url?: string;
+}
+
+export class GitHubService {
+  private getClient(token?: string): Octokit {
+    return new Octokit(token ? { auth: token } : {});
+  }
+
+  async listFolders(node: RepositoryNode, path: string): Promise<GitHubFileEntry[]> {
+    const client = this.getClient(node.token);
+    const response = await client.repos.getContent({
+      owner: node.owner,
+      repo: node.repo,
+      path,
+    });
+    if (Array.isArray(response.data)) {
+      return response.data
+        .filter((item) => item.type === 'dir')
+        .map((item) => ({
+          name: item.name,
+          path: item.path,
+          type: 'dir' as const,
+        }));
+    }
+    return [];
+  }
+
+  async listMarkdownFiles(node: RepositoryNode, path: string): Promise<GitHubFileEntry[]> {
+    const client = this.getClient(node.token);
+    const response = await client.repos.getContent({
+      owner: node.owner,
+      repo: node.repo,
+      path,
+    });
+    if (Array.isArray(response.data)) {
+      return response.data
+        .filter((item) => item.type === 'file' && item.name.toLowerCase().endsWith('.md'))
+        .map((item) => ({
+          name: item.name,
+          path: item.path,
+          type: 'file' as const,
+          download_url: item.download_url ?? undefined,
+        }));
+    }
+    return [];
+  }
+
+  async getFileContent(node: RepositoryNode, path: string): Promise<string> {
+    const client = this.getClient(node.token);
+    const response = await client.repos.getContent({
+      owner: node.owner,
+      repo: node.repo,
+      path,
+      mediaType: {
+        format: 'raw',
+      },
+    });
+    if (typeof response.data === 'string') {
+      return response.data;
+    }
+    if ('content' in response.data && typeof response.data.content === 'string') {
+	  const encoding = response.data.encoding as BufferEncoding ?? 'base64';
+      const buffer = Buffer.from(response.data.content, encoding);
+      return buffer.toString('utf-8');
+    }
+    return '';
+  }
+
+  async findMarketplace(node: RepositoryNode, basePath: string): Promise<MarketplaceFile | undefined> {
+    const candidates = ['marketplace.yml', 'marketplace.yaml', 'marketplace.json'];
+    for (const file of candidates) {
+      try {
+        const content = await this.getFileContent(node, `${basePath}/${file}`);
+        return parseMarketplace(content, file);
+      } catch (error: any) {
+        if (error.status === 404) {
+          continue;
+        }
+        throw error;
+      }
+    }
+    return undefined;
+  }
+
+  async downloadFile(node: RepositoryNode, path: string): Promise<Buffer> {
+    const client = this.getClient(node.token);
+    const response = await client.repos.getContent({
+      owner: node.owner,
+      repo: node.repo,
+      path,
+      mediaType: { format: 'raw' },
+    });
+    if (typeof response.data === 'string') {
+      return Buffer.from(response.data);
+    }
+    if ('content' in response.data && typeof response.data.content === 'string') {
+	  const encoding = response.data.encoding as BufferEncoding ?? 'base64';
+      return Buffer.from(response.data.content, encoding);
+    }
+    return Buffer.from([]);
+  }
+
+  async listDirectory(node: RepositoryNode, path: string): Promise<GitHubFileEntry[]> {
+    const client = this.getClient(node.token);
+    const response = await client.repos.getContent({
+      owner: node.owner,
+      repo: node.repo,
+      path,
+    });
+    if (Array.isArray(response.data)) {
+      return response.data.map((item) => ({
+        name: item.name,
+        path: item.path,
+        type: item.type === 'dir' ? 'dir' : 'file',
+        download_url: item.download_url ?? undefined,
+      }));
+    }
+    return [];
+  }
+
+  async downloadFolder(
+    node: RepositoryNode,
+    folderPath: string,
+    currentPath = ''
+  ): Promise<Array<{ relativePath: string; content: Buffer }>> {
+    const entries = await this.listDirectory(node, folderPath);
+    const results: Array<{ relativePath: string; content: Buffer }> = [];
+    for (const entry of entries) {
+      const nestedPath = currentPath ? `${currentPath}/${entry.name}` : entry.name;
+      if (entry.type === 'dir') {
+        const child = await this.downloadFolder(node, `${folderPath}/${entry.name}`, nestedPath);
+        results.push(...child);
+      } else {
+        const content = await this.downloadFile(node, entry.path);
+        results.push({ relativePath: nestedPath, content });
+      }
+    }
+    return results;
+  }
+}
