@@ -18,7 +18,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   })
 
 
-  const treeView = vscode.window.createTreeView('cortexExplorer', {
+  const treeView = vscode.window.createTreeView('emrDeveloperCortexViewer', {
     treeDataProvider,
     showCollapseAll: true,
   });
@@ -38,7 +38,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   context.subscriptions.push(
     configChangeListener,
-    vscode.commands.registerCommand('githubMarkdownViewer.refresh', () => treeDataProvider.refresh())
+    vscode.commands.registerCommand('emrDeveloperCortexViewer.refresh', () => treeDataProvider.refresh())
   );
 }
 

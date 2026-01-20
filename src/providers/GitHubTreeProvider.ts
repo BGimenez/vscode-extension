@@ -41,7 +41,7 @@ export class GitHubTreeProvider implements vscode.TreeDataProvider<TreeNode>, In
 
     if (element.type === 'file' && element.repository && element.path) {
       item.command = {
-        command: 'githubMarkdownViewer.previewFile',
+        command: 'emrDeveloperCortexViewer.previewFile',
         title: 'Pré-visualizar',
         arguments: [element.repository, element.path],
       };
