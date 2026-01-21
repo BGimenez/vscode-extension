@@ -2,7 +2,8 @@ export interface RepositoryNode {
   domain: string;
   owner: string;
   repo: string;
-  basePath?: string;
-  downloadPath?: string;
+  label: string;
+  path?: string;
   token?: string;
+//   downloadPath?: string;
 }

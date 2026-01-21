@@ -2,6 +2,7 @@ import axios from 'axios';
 import { RepositoryNode } from '../models/Repository';
 import { MarketplaceFile } from '../models/Marketplace';
 import { parseMarketplace } from '../utils/marketplaceParser';
+import HttpClient from '../infra/http/HttpClient';
 
 export interface GitHubFileEntry {
   name: string;
@@ -13,9 +14,22 @@ export interface GitHubFileEntry {
 //TODO: Migrar para usar axios  ou fetch ao inves de Octokit
 export class GitHubService {
 
-  private getClient(token?: string): AxiosInstance {
-    return axios;
-  }
+	constructor(readonly httpClient: HttpClient){}
+
+	async listFolders(node: RepositoryNode): Promise<GitHubFileEntry[]> {
+		const response = await this.httpClient.get(node.domain, node.owner, node.repo, node.path, node.token);
+		if (Array.isArray(response)) {
+			return response
+				.filter((item) => item.type === 'dir')
+				.map((item) => ({
+				name: item.name,
+				path: item.path,
+				type: 'dir' as const,
+				}));
+		}
+		return [];
+	}
+
 
   async checkRepositoryPlugins(repository: RepositoryNode): Promise<boolean> {
     const client = this.getClient(repository.token);
@@ -35,24 +49,7 @@ export class GitHubService {
   }
 
 
-  async listFolders(node: RepositoryNode, path: string): Promise<GitHubFileEntry[]> {
-    const client = this.getClient(node.token);
-    const response = await client.repos.getContent({
-      owner: node.owner,
-      repo: node.repo,
-      path,
-    });
-    if (Array.isArray(response.data)) {
-      return response.data
-        .filter((item) => item.type === 'dir')
-        .map((item) => ({
-          name: item.name,
-          path: item.path,
-          type: 'dir' as const,
-        }));
-    }
-    return [];
-  }
+  
 
   async listMarkdownFiles(node: RepositoryNode, path: string): Promise<GitHubFileEntry[]> {
     const client = this.getClient(node.token);

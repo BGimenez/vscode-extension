@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { RepositoryConfig } from '../models/Config';
+import { ExtensionConfig, RepositoryConfig } from '../models/Config';
 
-const GLOBAL_KEY = 'cortex.sources';
+// const GLOBAL_KEY = 'cortex.sources';
 const REPO_KEY = 'cortex.repositories';
 const DEFAULT_REPO: RepositoryConfig[] = [{
   domain: 'github.com',
@@ -9,6 +9,11 @@ const DEFAULT_REPO: RepositoryConfig[] = [{
   repo: 'emr-developer-cortex',
   label: 'EMR Developer Cortex',
 }];
+const DEFAULT_CONFIG: ExtensionConfig = {
+  repositories: DEFAULT_REPO,
+  aiTool: 'cursor',
+  installationScope: 'Global',
+};
 //TODO: Essa classe deverá ser responsável por gerenciar as configurações dos repositorios
 // e outras configurações da extensão como: token de autenticação, etc.
 export class ConfigService {
@@ -38,17 +43,27 @@ export class ConfigService {
       // context.globalState.update(GLOBAL_KEY, repositories);
       return repositories;
     }
-
     // const globalRepos = context.globalState.get<RepositoryConfig[]>(GLOBAL_KEY, []);
     // if (globalRepos && Array.isArray(globalRepos) && globalRepos.length > 0) {
-    //   this.syncConfigToSettings(globalRepos);
-    //   return globalRepos;
-    // }
+		//   this.syncConfigToSettings(globalRepos);
+		//   return globalRepos;
+		// }
+		
+		this.syncConfigToSettings(DEFAULT_REPO);
+		// context.globalState.update(GLOBAL_KEY, DEFAULT_REPO);
+		return this.getDefaultRepositories();
+	}
 
-    this.syncConfigToSettings(DEFAULT_REPO);
-    // context.globalState.update(GLOBAL_KEY, DEFAULT_REPO);
-    return this.getDefaultRepositories();
-  }
+	/**
+	 * Get a specific repository by owner and repo name
+	 * @param owner Repository owner
+	 * @param repo Repository name
+	 * @returns RepositoryConfig instance
+	 */
+	static getRepository(owner: string, repo: string): RepositoryConfig | null {
+		const repositories = this.getRepositories();
+		return repositories.find(r => r.owner === owner && r.repo === repo) || null;
+	  }
 
   /**
    * Set repository in both global and VS Code settings
@@ -63,6 +78,20 @@ export class ConfigService {
       ...repositories,
       repository
     ]);
+  }
+
+  static async updateRepository(repository: RepositoryConfig): Promise<void> {
+	const repositories = this.getRepositories();
+	const updatedRepos = repositories.map(repo => 
+		repository.owner === repo.owner && repository.repo === repo.repo ? repository : repo
+	);
+	await this.syncConfigToSettings(updatedRepos);
+  }
+
+  static async updateConfiguration(ide: string, installationScope: string): Promise<void> {
+	const configuration = vscode.workspace.getConfiguration();
+	await configuration.update('cortex.aiTool', ide, vscode.ConfigurationTarget.Global);
+	await configuration.update('cortex.installationScope', installationScope, vscode.ConfigurationTarget.Global);
   }
 
   /**

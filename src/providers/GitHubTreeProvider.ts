@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { ConfigService } from '../services/ConfigService';
 import { GitHubService, GitHubFileEntry } from '../services/GitHubService';
 import { RepositoryNode } from '../models/Repository';
 import { MarketplacePlugin } from '../models/Marketplace';
+import { ConfigService } from '../services/ConfigService';
 
 type ItemType = 'repository' | 'folder' | 'file' | 'plugin';
 
@@ -24,10 +24,7 @@ export class GitHubTreeProvider implements vscode.TreeDataProvider<TreeNode>, In
   readonly onDidChangeTreeData: vscode.Event<TreeNode | undefined | null | void> =
     this._onDidChangeTreeData.event;
 
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly gitHubService: GitHubService
-  ) { }
+  constructor() { }
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
@@ -57,7 +54,7 @@ export class GitHubTreeProvider implements vscode.TreeDataProvider<TreeNode>, In
 
     switch (element.type) {
       case 'repository':
-        return this.getRepositoryChildren(element.repository!);
+        return this.getRepositoryFolders(element.repository!);
       case 'folder':
         return this.getFolderChildren(element.repository!, element.path!);
       case 'plugin':
@@ -68,21 +65,29 @@ export class GitHubTreeProvider implements vscode.TreeDataProvider<TreeNode>, In
   }
 
   private async getRepositories(): Promise<TreeNode[]> {
-    const config = this.configService.getConfig();
-    return config.repositories.map((repo) => ({
+    const repositories = ConfigService.getRepositories();
+    return repositories.map((repo) => ({
       type: 'repository',
-      label: `${repo.owner}/${repo.repo}`,
+      label: repo.label || `${repo.owner}/${repo.repo}`,
       repository: {
         owner: repo.owner,
         repo: repo.repo,
-        token: repo.token,
-        basePath: repo.basePath ?? config.defaultBasePath,
-        downloadPath: repo.downloadPath ?? config.defaultDownloadPath,
+		label: repo.label || `${repo.owner}/${repo.repo}`,
+		domain: repo.domain,
+        // token: repo.token,
+        // basePath: repo.basePath ?? config.defaultBasePath,
+        // downloadPath: repo.downloadPath ?? config.defaultDownloadPath,
       },
     }));
   }
 
-  private async getRepositoryChildren(repository: RepositoryNode): Promise<TreeNode[]> {
+  //TODO: Deve ler o arquivo .cortex-plugin/marketplace.md para listar as pastas e arquivos corretamente
+  //se o arquivo não existir, apresentar vazio
+  private async getRepositoryFolders(repository: RepositoryNode): Promise<TreeNode[]> {
+	GitHubService
+
+
+
     const basePath = repository.basePath ?? '';
     const children: TreeNode[] = [];
 

@@ -11,6 +11,6 @@ export interface RepositoryConfig {
 
 export interface ExtensionConfig {
   repositories: RepositoryConfig[];
-  defaultBasePath: string;
-  defaultDownloadPath: string;
+  aiTool: 'vscode' | 'copilot' | 'cursor' | 'windsurf' | 'claude';
+  installationScope: 'Global' | 'Workspace';
 }

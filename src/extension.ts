@@ -11,7 +11,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const gitHubService = new GitHubService();
   const fileService = new FileService();
   const treeDataProvider = new GitHubTreeProvider(gitHubService, context);
-  await ConfigService.initializeConfig(context);
+  await ConfigService.initializeConfig();
 
   const configChangeListener = ConfigService.onConfigurationChanged(context, () => {
     treeDataProvider.refresh();
@@ -34,11 +34,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   context.subscriptions.push(treeView);
 
-  registerCommands(context, statusBarService, gitHubService, fileService);
+  registerCommands(context, statusBarService, treeDataProvider);
 
   context.subscriptions.push(
     configChangeListener,
-    vscode.commands.registerCommand('emrDeveloperCortexViewer.refresh', () => treeDataProvider.refresh())
+    // vscode.commands.registerCommand('emrDeveloperCortexViewer.refresh', () => treeDataProvider.refresh())
   );
 }
 

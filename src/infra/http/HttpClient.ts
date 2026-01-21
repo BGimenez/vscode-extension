@@ -2,7 +2,7 @@ import axios from 'axios';
 import GitHubFormatter from '../../utils/GitHubFormatter';
 
 export default interface HttpClient {
-	get(domain: string, owner: string, repo: string, path?: string): Promise<any>;
+	get(domain: string, owner: string, repo: string, path?: string, token?: string): Promise<any>;
 }
 
 export class AxiosAdapter implements HttpClient {
