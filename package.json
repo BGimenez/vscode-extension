@@ -1,7 +1,7 @@
 {
-  "name": "vscode-github-markdown-viewer",
-  "displayName": "GitHub Markdown Viewer",
-  "description": "Exibe arquivos .md de repositórios GitHub em Tree View, com pré-visualização e download.",
+  "name": "emr-developer-cortex",
+  "displayName": "EMR Developer Cortex",
+  "description": "Gerenciador de prompts AI.",
   "version": "0.0.1",
   "publisher": "extensao-cortex",
   "engines": {
@@ -11,88 +11,88 @@
     "Other"
   ],
   "activationEvents": [
-    "onView:githubMarkdownViewer",
-    "onCommand:githubMarkdownViewer.refresh",
-    "onCommand:githubMarkdownViewer.configureRepository",
-    "onCommand:githubMarkdownViewer.configureBasePath",
-    "onCommand:githubMarkdownViewer.configureDownloadPath",
-    "onCommand:githubMarkdownViewer.listRepositories",
-    "onCommand:githubMarkdownViewer.previewFile",
-    "onCommand:githubMarkdownViewer.downloadFile",
-    "onCommand:githubMarkdownViewer.downloadPlugin"
+    "onView:emrDeveloperCortexViewer",
+    "onCommand:emrDeveloperCortexViewer.refresh",
+    "onCommand:emrDeveloperCortexViewer.configureRepository",
+    "onCommand:emrDeveloperCortexViewer.configureBasePath",
+    "onCommand:emrDeveloperCortexViewer.configureDownloadPath",
+    "onCommand:emrDeveloperCortexViewer.listRepositories",
+    "onCommand:emrDeveloperCortexViewer.previewFile",
+    "onCommand:emrDeveloperCortexViewer.downloadFile",
+    "onCommand:emrDeveloperCortexViewer.downloadPlugin"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "views": {
       "explorer": [
         {
-          "id": "githubMarkdownViewer",
-          "name": "GitHub Markdown Viewer"
+          "id": "emrDeveloperCortexViewer",
+          "name": "EMR Developer Cortex"
         }
       ]
     },
     "commands": [
       {
-        "command": "githubMarkdownViewer.refresh",
-        "title": "GitHub Markdown Viewer: Refresh"
+        "command": "emrDeveloperCortexViewer.refresh",
+        "title": "EMR Developer Cortex: Refresh"
       },
       {
-        "command": "githubMarkdownViewer.configureRepository",
-        "title": "GitHub Markdown Viewer: Configurar Repositórios"
+        "command": "emrDeveloperCortexViewer.configureRepository",
+        "title": "EMR Developer Cortex: Configurar Repositórios"
       },
       {
-        "command": "githubMarkdownViewer.configureBasePath",
-        "title": "GitHub Markdown Viewer: Configurar Pasta Base"
+        "command": "emrDeveloperCortexViewer.configureBasePath",
+        "title": "EMR Developer Cortex: Configurar Pasta Base"
       },
       {
-        "command": "githubMarkdownViewer.configureDownloadPath",
-        "title": "GitHub Markdown Viewer: Configurar Diretório de Download"
+        "command": "emrDeveloperCortexViewer.configureDownloadPath",
+        "title": "EMR Developer Cortex: Configurar Diretório de Download"
       },
       {
-        "command": "githubMarkdownViewer.listRepositories",
-        "title": "GitHub Markdown Viewer: Listar Repositórios"
+        "command": "emrDeveloperCortexViewer.listRepositories",
+        "title": "EMR Developer Cortex: Listar Repositórios"
       },
       {
-        "command": "githubMarkdownViewer.previewFile",
-        "title": "GitHub Markdown Viewer: Pré-visualizar Arquivo"
+        "command": "emrDeveloperCortexViewer.previewFile",
+        "title": "EMR Developer Cortex: Pré-visualizar Arquivo"
       },
       {
-        "command": "githubMarkdownViewer.downloadFile",
-        "title": "GitHub Markdown Viewer: Baixar Arquivo"
+        "command": "emrDeveloperCortexViewer.downloadFile",
+        "title": "EMR Developer Cortex: Baixar Arquivo"
       },
       {
-        "command": "githubMarkdownViewer.downloadPlugin",
-        "title": "GitHub Markdown Viewer: Baixar Plugin"
+        "command": "emrDeveloperCortexViewer.downloadPlugin",
+        "title": "EMR Developer Cortex: Baixar Plugin"
       }
     ],
     "menus": {
       "view/item/context": [
         {
-          "command": "githubMarkdownViewer.previewFile",
-          "when": "view == githubMarkdownViewer && viewItem == file",
+          "command": "emrDeveloperCortexViewer.previewFile",
+          "when": "view == emrDeveloperCortexViewer && viewItem == file",
           "group": "inline"
         },
         {
-          "command": "githubMarkdownViewer.downloadFile",
-          "when": "view == githubMarkdownViewer && viewItem == file",
+          "command": "emrDeveloperCortexViewer.downloadFile",
+          "when": "view == emrDeveloperCortexViewer && viewItem == file",
           "group": "inline"
         },
         {
-          "command": "githubMarkdownViewer.downloadPlugin",
-          "when": "view == githubMarkdownViewer && viewItem == plugin",
+          "command": "emrDeveloperCortexViewer.downloadPlugin",
+          "when": "view == emrDeveloperCortexViewer && viewItem == plugin",
           "group": "inline"
         },
         {
-          "command": "githubMarkdownViewer.refresh",
-          "when": "view == githubMarkdownViewer",
+          "command": "emrDeveloperCortexViewer.refresh",
+          "when": "view == emrDeveloperCortexViewer",
           "group": "navigation"
         }
       ]
     },
     "configuration": {
-      "title": "GitHub Markdown Viewer",
+      "title": "EMR Developer Cortex",
       "properties": {
-        "githubMarkdownViewer.repositories": {
+        "emrDeveloperCortexViewer.repositories": {
           "type": "array",
           "default": [],
           "description": "Lista de repositórios configurados",
@@ -121,12 +121,12 @@
             ]
           }
         },
-        "githubMarkdownViewer.defaultBasePath": {
+        "emrDeveloperCortexViewer.defaultBasePath": {
           "type": "string",
           "default": "eng",
           "description": "Pasta base padrão para listagem."
         },
-        "githubMarkdownViewer.defaultDownloadPath": {
+        "emrDeveloperCortexViewer.defaultDownloadPath": {
           "type": "string",
           "default": "./downloads",
           "description": "Diretório padrão para download."
@@ -137,16 +137,23 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "test": "npx jest test",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/js-yaml": "^4.0.0",
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.80.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
     "typescript": "^5.0.0"
   },
   "dependencies": {
     "@octokit/rest": "^20.0.0",
+    "axios": "^1.13.2",
     "js-yaml": "^4.1.0"
   }
 }
