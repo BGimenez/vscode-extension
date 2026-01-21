@@ -1,4 +1,4 @@
-import { Octokit } from '@octokit/rest';
+import axios from 'axios';
 import { RepositoryNode } from '../models/Repository';
 import { MarketplaceFile } from '../models/Marketplace';
 import { parseMarketplace } from '../utils/marketplaceParser';
@@ -10,10 +10,30 @@ export interface GitHubFileEntry {
   download_url?: string;
 }
 
+//TODO: Migrar para usar axios  ou fetch ao inves de Octokit
 export class GitHubService {
-  private getClient(token?: string): Octokit {
-    return new Octokit(token ? { auth: token } : {});
+
+  private getClient(token?: string): AxiosInstance {
+    return axios;
   }
+
+  async checkRepositoryPlugins(repository: RepositoryNode): Promise<boolean> {
+    const client = this.getClient(repository.token);
+    const url = this.formatUrl(repository.domain, repository.owner, repository.repo);
+    const headers: Record<string, string> = {
+      'User-Agent': 'Cortex',
+      'Accept': 'application/vnd.github.v3+json',
+    };
+    if (repository.isEnterprise) {
+      headers['Authorization'] = `token ${repository.token}`;
+    }
+    const response = await client.get(url, { headers });
+    if (response.status === 200) {
+      return true;
+    }
+    return false;
+  }
+
 
   async listFolders(node: RepositoryNode, path: string): Promise<GitHubFileEntry[]> {
     const client = this.getClient(node.token);
@@ -68,7 +88,7 @@ export class GitHubService {
       return response.data;
     }
     if ('content' in response.data && typeof response.data.content === 'string') {
-	  const encoding = response.data.encoding as BufferEncoding ?? 'base64';
+      const encoding = response.data.encoding as BufferEncoding ?? 'base64';
       const buffer = Buffer.from(response.data.content, encoding);
       return buffer.toString('utf-8');
     }
@@ -103,7 +123,7 @@ export class GitHubService {
       return Buffer.from(response.data);
     }
     if ('content' in response.data && typeof response.data.content === 'string') {
-	  const encoding = response.data.encoding as BufferEncoding ?? 'base64';
+      const encoding = response.data.encoding as BufferEncoding ?? 'base64';
       return Buffer.from(response.data.content, encoding);
     }
     return Buffer.from([]);

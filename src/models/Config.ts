@@ -1,9 +1,11 @@
 export interface RepositoryConfig {
+  domain: string;
   owner: string;
   repo: string;
   label: string;
   token?: string;
-  basePath?: string;
+  isEnterprise?: boolean;
+  baseUrl?: string;
   downloadPath?: string;
 }
 

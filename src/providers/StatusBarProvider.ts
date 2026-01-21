@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 export default interface MessageProvider {
 	showInfo(message: string, duration?: number): void;
 	showWarning(message: string, duration?: number): void;
+	showError(message: string, duration?: number): void;
 }
 
 export class StatusBarVsCodeProvider implements MessageProvider {
@@ -20,6 +21,10 @@ export class StatusBarVsCodeProvider implements MessageProvider {
 
 	showWarning(message: string, duration: number = 6000): void {
 		this.showStatus(message, duration, 'warning');
+	}
+
+	showError(message: string, duration: number = 6000): void {
+		this.showStatus(message, duration, 'error');
 	}
 
 	/**
