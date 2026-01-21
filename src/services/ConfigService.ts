@@ -4,6 +4,7 @@ import { RepositoryConfig } from '../models/Config';
 const GLOBAL_KEY = 'cortex.sources';
 const REPO_KEY = 'cortex.repositories';
 const DEFAULT_REPO: RepositoryConfig[] = [{
+  domain: 'github.com',
   owner: 'philips-internal',
   repo: 'emr-developer-cortex',
   label: 'EMR Developer Cortex',
@@ -46,7 +47,7 @@ export class ConfigService {
 
     this.syncConfigToSettings(DEFAULT_REPO);
     // context.globalState.update(GLOBAL_KEY, DEFAULT_REPO);
-    return [...DEFAULT_REPO];
+    return this.getDefaultRepositories();
   }
 
   /**
@@ -55,9 +56,13 @@ export class ConfigService {
    * @param repositories RepositoryConfig[]
    */
   // static async setRepositories(context: vscode.ExtensionContext, repositories: RepositoryConfig[]): Promise<void> {
-  static async setRepositories(repositories: RepositoryConfig[]): Promise<void> {
+  static async setRepository(repository: RepositoryConfig): Promise<void> {
     // await context.globalState.update(GLOBAL_KEY, repositories);
-    await this.syncConfigToSettings(repositories);
+    const repositories = this.getRepositories();
+    await this.syncConfigToSettings([
+      ...repositories,
+      repository
+    ]);
   }
 
   /**
@@ -65,7 +70,7 @@ export class ConfigService {
    * @returns RepositoryConfig[]
    */
   static getDefaultRepositories(): RepositoryConfig[] {
-    return [...DEFAULT_REPO];
+    return DEFAULT_REPO;
   }
 
   /**
