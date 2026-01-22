@@ -3,7 +3,7 @@ export interface MarketplaceOwner {
   url?: string;
 }
 
-export interface MarketplacePlugin {
+export interface MarketplaceSource {
   name: string;
   description?: string;
   version?: string;
@@ -18,5 +18,6 @@ export interface MarketplacePlugin {
 export interface MarketplaceFile {
   name: string;
   owner?: MarketplaceOwner;
-  plugins: MarketplacePlugin[];
+  plugins?: MarketplaceSource[];
+  collections?: MarketplaceSource[];
 }

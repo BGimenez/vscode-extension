@@ -4,7 +4,7 @@ import { RepositoryNode } from '../models/Repository';
 import { MarketplacePlugin } from '../models/Marketplace';
 import { ConfigService } from '../services/ConfigService';
 
-type ItemType = 'repository' | 'folder' | 'file' | 'plugin';
+type ItemType = 'repository' | 'dir' | 'file' | 'plugin';
 
 export interface TreeNode {
   type: ItemType;
@@ -24,7 +24,7 @@ export class GitHubTreeProvider implements vscode.TreeDataProvider<TreeNode>, In
   readonly onDidChangeTreeData: vscode.Event<TreeNode | undefined | null | void> =
     this._onDidChangeTreeData.event;
 
-  constructor() { }
+  constructor(readonly gitHubService: GitHubService) { }
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
@@ -54,8 +54,8 @@ export class GitHubTreeProvider implements vscode.TreeDataProvider<TreeNode>, In
 
     switch (element.type) {
       case 'repository':
-        return this.getRepositoryFolders(element.repository!);
-      case 'folder':
+        return this.getRepositorySources(element.repository!);
+      case 'dir':
         return this.getFolderChildren(element.repository!, element.path!);
       case 'plugin':
         return this.getPluginChildren(element.repository!, element.plugin!);
@@ -74,8 +74,8 @@ export class GitHubTreeProvider implements vscode.TreeDataProvider<TreeNode>, In
         repo: repo.repo,
 		label: repo.label || `${repo.owner}/${repo.repo}`,
 		domain: repo.domain,
-        // token: repo.token,
-        // basePath: repo.basePath ?? config.defaultBasePath,
+        token: repo.token,
+        path: repo.path,
         // downloadPath: repo.downloadPath ?? config.defaultDownloadPath,
       },
     }));
@@ -83,44 +83,28 @@ export class GitHubTreeProvider implements vscode.TreeDataProvider<TreeNode>, In
 
   //TODO: Deve ler o arquivo .cortex-plugin/marketplace.md para listar as pastas e arquivos corretamente
   //se o arquivo não existir, apresentar vazio
-  private async getRepositoryFolders(repository: RepositoryNode): Promise<TreeNode[]> {
-	GitHubService
+	private async getRepositorySources(repository: RepositoryNode): Promise<TreeNode[]> {
+		const sources = await this.gitHubService.listSources(repository);
+		if (sources.length === 0) {
+			return [];
+		}
 
+		const children: TreeNode[] = [];
 
+		try {
+			children.push(
+				...sources.map((folder) => ({
+				type: folder.type,
+				label: folder.name,
+				path: folder.path,
+				repository,
+				})));
+		} catch (error: any) {
+			vscode.window.showErrorMessage(`Erro ao listar pastas: ${error.message ?? error}`);
+		}
 
-    const basePath = repository.basePath ?? '';
-    const children: TreeNode[] = [];
-
-    try {
-      const folders = await this.gitHubService.listFolders(repository, basePath);
-      children.push(
-        ...folders.map((folder) => ({
-          type: 'folder' as const,
-          label: folder.name,
-          path: folder.path,
-          repository,
-        }))
-      );
-    } catch (error: any) {
-      vscode.window.showErrorMessage(`Erro ao listar pastas: ${error.message ?? error}`);
-    }
-
-    try {
-      const marketplace = await this.gitHubService.findMarketplace(repository, basePath);
-      if (marketplace && marketplace.plugins?.length) {
-        children.push({
-          type: 'folder',
-          label: 'plugins',
-          path: `${basePath}/plugins`,
-          repository,
-        });
-      }
-    } catch (error: any) {
-      // silêncio para marketplace inexistente
-    }
-
-    return children;
-  }
+		return children;
+	}
 
   private async getFolderChildren(repository: RepositoryNode, folderPath: string): Promise<TreeNode[]> {
     const nodes: TreeNode[] = [];

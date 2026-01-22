@@ -8,6 +8,7 @@ const DEFAULT_REPO: RepositoryConfig[] = [{
   owner: 'philips-internal',
   repo: 'emr-developer-cortex',
   label: 'EMR Developer Cortex',
+  path: '.cortex-plugins',
 }];
 const DEFAULT_CONFIG: ExtensionConfig = {
   repositories: DEFAULT_REPO,

@@ -28,6 +28,14 @@ test('deve retornar o arquivo json', async () => {
 	expect(result[0].type).toBe('file');
 });
 
+test('deve retornar o arquivo como raw', async () => {
+	const url = 'https://raw.githubusercontent.com/philips-internal/emr-developer-cortex/main/.cortex-plugin/marketplace.json?token=A3HSOUJT2LRPWFGSMIHKYITJOI56HAA';
+	const token = process.env.GH_TOKEN;
+	const httpClient = new AxiosAdapter();
+	const result = await httpClient.getByUrl(url, token);
+	expect(result).toBeDefined();
+});
+
 test('deve lançar um erro ao fazer uma requisição GET para um repositório inexistente', async () => {
 	const domain = 'github.com';
 	const owner = 'repositorio-inexistente';

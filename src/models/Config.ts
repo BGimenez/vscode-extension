@@ -3,6 +3,7 @@ export interface RepositoryConfig {
   owner: string;
   repo: string;
   label: string;
+  path: string;
   token?: string;
   isEnterprise?: boolean;
   baseUrl?: string;
