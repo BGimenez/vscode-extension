@@ -11,10 +11,10 @@ export function registerCommands(
 ): void {
   //Register manage repositories command (UI entry point)
   context.subscriptions.push(
-	vscode.commands.registerCommand('cortex.manageConfiguration', async () => commandsAction.manageConfiguration()),
-	vscode.commands.registerCommand('cortex.configureToken', async () => commandsAction.configureToken()),
-	vscode.commands.registerCommand('cortex.viewRepositories', async () => commandsAction.viewRepositories()),
-	vscode.commands.registerCommand('cortex.refresh', () => provider.refresh()),
+	vscode.commands.registerCommand('emrDeveloperCortexViewer.manageConfiguration', async () => commandsAction.manageConfiguration()),
+	vscode.commands.registerCommand('emrDeveloperCortexViewer.configureToken', async () => commandsAction.configureToken()),
+	vscode.commands.registerCommand('emrDeveloperCortexViewer.viewRepositories', async () => commandsAction.viewRepositories()),
+	vscode.commands.registerCommand('emrDeveloperCortexViewer.refresh', () => provider.refresh()),
   );
 
 //     //TODO: Ajustar as rotinas de download para baixar nas pastas corretas de acordo com o tipo, ex.: "*.agents.md" deve baixar na pasta "agents", "*.prompts.md" deve baixar na pasta "prompts", etc. 

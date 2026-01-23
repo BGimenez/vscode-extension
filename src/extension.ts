@@ -4,14 +4,20 @@ import { ConfigService } from './services/ConfigService';
 import { GitHubService } from './services/GitHubService';
 import { FileService } from './services/FileService';
 import { registerCommands } from './commands';
-import { StatusBarService } from './providers/StatusBarProvider';
+// import { StatusBarService } from './providers/StatusBarProvider';
+import { AxiosAdapter } from './infra/http/HttpClient';
+import { StatusBarVsCodeProvider } from './providers/StatusBarProvider';
+import { CommandsActionVsCode } from './commands/CommandsAction';
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  const statusBarService = new StatusBarService();
-  const gitHubService = new GitHubService();
-  const fileService = new FileService();
-  const treeDataProvider = new GitHubTreeProvider(gitHubService, context);
-  await ConfigService.initializeConfig();
+	const httpClient = new AxiosAdapter();
+	const statusBarService = new StatusBarVsCodeProvider();
+	const commandsAction = new CommandsActionVsCode(statusBarService)
+	const gitHubService = new GitHubService(httpClient);
+	// const fileService = new FileService();
+	const treeDataProvider = new GitHubTreeProvider(gitHubService);
+	console.log('INICIALIZANDO EXTENSÃO EMR Developer Cortex Viewer');
+	await ConfigService.initializeConfig();
 
   const configChangeListener = ConfigService.onConfigurationChanged(context, () => {
     treeDataProvider.refresh();
@@ -34,7 +40,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   context.subscriptions.push(treeView);
 
-  registerCommands(context, statusBarService, treeDataProvider);
+  registerCommands(context, commandsAction, treeDataProvider);
 
   context.subscriptions.push(
     configChangeListener,

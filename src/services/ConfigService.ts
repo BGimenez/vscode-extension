@@ -8,7 +8,7 @@ const DEFAULT_REPO: RepositoryConfig[] = [{
   owner: 'philips-internal',
   repo: 'emr-developer-cortex',
   label: 'EMR Developer Cortex',
-  path: '.cortex-plugins',
+  path: '.cortex-plugin',
 }];
 const DEFAULT_CONFIG: ExtensionConfig = {
   repositories: DEFAULT_REPO,
@@ -29,7 +29,7 @@ export class ConfigService {
   // static async initializeConfig(context: vscode.ExtensionContext): Promise<void> {
   static async initializeConfig(): Promise<void> {
     // const repositories = this.getRepositories(context);
-    const repositories = this.getRepositories();
+    const repositories = await this.getRepositories();
     console.log('Loaded repositories:', repositories.map(r => `${r.owner}/${r.repo}`).join(', '));
   }
 
@@ -37,9 +37,10 @@ export class ConfigService {
    * Get repositories and sources from VS Code settings, then fallback to global state
    */
   // static getRepositories(context: vscode.ExtensionContext): RepositoryConfig[] {
-  static getRepositories(): RepositoryConfig[] {
+  static async getRepositories(): Promise<RepositoryConfig[]> {
     const configuration = vscode.workspace.getConfiguration();
     const repositories = configuration.get<RepositoryConfig[]>(REPO_KEY, []);
+	console.log('Repositories from settings:', repositories);
     if (repositories && Array.isArray(repositories) && repositories.length > 0) {
       // context.globalState.update(GLOBAL_KEY, repositories);
       return repositories;
@@ -50,7 +51,7 @@ export class ConfigService {
 		//   return globalRepos;
 		// }
 		
-		this.syncConfigToSettings(DEFAULT_REPO);
+		await this.syncConfigToSettings(DEFAULT_REPO);
 		// context.globalState.update(GLOBAL_KEY, DEFAULT_REPO);
 		return this.getDefaultRepositories();
 	}
@@ -61,8 +62,8 @@ export class ConfigService {
 	 * @param repo Repository name
 	 * @returns RepositoryConfig instance
 	 */
-	static getRepository(owner: string, repo: string): RepositoryConfig | null {
-		const repositories = this.getRepositories();
+	static async getRepository(owner: string, repo: string): Promise<RepositoryConfig | null> {
+		const repositories = await this.getRepositories();
 		return repositories.find(r => r.owner === owner && r.repo === repo) || null;
 	  }
 
@@ -74,7 +75,7 @@ export class ConfigService {
   // static async setRepositories(context: vscode.ExtensionContext, repositories: RepositoryConfig[]): Promise<void> {
   static async setRepository(repository: RepositoryConfig): Promise<void> {
     // await context.globalState.update(GLOBAL_KEY, repositories);
-    const repositories = this.getRepositories();
+    const repositories = await this.getRepositories();
     await this.syncConfigToSettings([
       ...repositories,
       repository
@@ -82,7 +83,7 @@ export class ConfigService {
   }
 
   static async updateRepository(repository: RepositoryConfig): Promise<void> {
-	const repositories = this.getRepositories();
+	const repositories = await this.getRepositories();
 	const updatedRepos = repositories.map(repo => 
 		repository.owner === repo.owner && repository.repo === repo.repo ? repository : repo
 	);
@@ -110,6 +111,7 @@ export class ConfigService {
   private static async syncConfigToSettings(repositories: RepositoryConfig[]): Promise<void> {
     try {
       const configuration = vscode.workspace.getConfiguration();
+	  console.log('Syncing repositories to settings:', configuration);
       await configuration.update(REPO_KEY, repositories, vscode.ConfigurationTarget.Global);
     } catch (error) {
       console.error('Failed to sync configuration to settings:', error);
@@ -126,7 +128,7 @@ export class ConfigService {
     return vscode.workspace.onDidChangeConfiguration(async (event) => {
       if (event.affectsConfiguration(REPO_KEY)) {
         // const repositories = this.getRepositories(context);
-        const repositories = this.getRepositories();
+        const repositories = await this.getRepositories();
         console.log('Configuration changed, updated repositories:', repositories.map(r => `${r.owner}/${r.repo}`).join(', '));
 
         if (callback) {

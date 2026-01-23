@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { GitHubService, GitHubFileEntry } from '../services/GitHubService';
 import { RepositoryNode } from '../models/Repository';
-import { MarketplacePlugin } from '../models/Marketplace';
+import { MarketplaceSource } from '../models/Marketplace';
 import { ConfigService } from '../services/ConfigService';
 
 type ItemType = 'repository' | 'dir' | 'file' | 'plugin';
@@ -11,7 +11,7 @@ export interface TreeNode {
   label: string;
   path?: string;
   repository?: RepositoryNode;
-  plugin?: MarketplacePlugin;
+  plugin?: MarketplaceSource;
 }
 
 export default interface InterfaceProvider {
@@ -44,28 +44,34 @@ export class GitHubTreeProvider implements vscode.TreeDataProvider<TreeNode>, In
       };
     }
 
+	console.log('Created TreeItem:', item);
+
     return item;
   }
 
   async getChildren(element?: TreeNode): Promise<TreeNode[]> {
     if (!element) {
-      return this.getRepositories();
+      const repos = await this.getRepositories();
+	  console.log('Loaded repositories for tree view:', repos);
+      return repos;
     }
+
+	console.log('Getting children for element:', element);
 
     switch (element.type) {
       case 'repository':
         return this.getRepositorySources(element.repository!);
-      case 'dir':
-        return this.getFolderChildren(element.repository!, element.path!);
-      case 'plugin':
-        return this.getPluginChildren(element.repository!, element.plugin!);
+    //   case 'dir':
+    //     return this.getFolderChildren(element.repository!, element.path!);
+    //   case 'plugin':
+    //     return this.getPluginChildren(element.repository!, element.plugin!);
       default:
         return [];
     }
   }
 
   private async getRepositories(): Promise<TreeNode[]> {
-    const repositories = ConfigService.getRepositories();
+    const repositories = await ConfigService.getRepositories();
     return repositories.map((repo) => ({
       type: 'repository',
       label: repo.label || `${repo.owner}/${repo.repo}`,
@@ -76,7 +82,6 @@ export class GitHubTreeProvider implements vscode.TreeDataProvider<TreeNode>, In
 		domain: repo.domain,
         token: repo.token,
         path: repo.path,
-        // downloadPath: repo.downloadPath ?? config.defaultDownloadPath,
       },
     }));
   }
@@ -106,63 +111,63 @@ export class GitHubTreeProvider implements vscode.TreeDataProvider<TreeNode>, In
 		return children;
 	}
 
-  private async getFolderChildren(repository: RepositoryNode, folderPath: string): Promise<TreeNode[]> {
-    const nodes: TreeNode[] = [];
+//   private async getFolderChildren(repository: RepositoryNode, folderPath: string): Promise<TreeNode[]> {
+//     const nodes: TreeNode[] = [];
 
-    try {
-      const files = await this.gitHubService.listMarkdownFiles(repository, folderPath);
-      nodes.push(
-        ...files.map((file) => ({
-          type: 'file' as const,
-          label: file.name,
-          path: file.path,
-          repository,
-        }))
-      );
-    } catch (error: any) {
-      vscode.window.showErrorMessage(`Erro ao listar arquivos: ${error.message ?? error}`);
-    }
+//     try {
+//       const files = await this.gitHubService.listMarkdownFiles(repository, folderPath);
+//       nodes.push(
+//         ...files.map((file) => ({
+//           type: 'file' as const,
+//           label: file.name,
+//           path: file.path,
+//           repository,
+//         }))
+//       );
+//     } catch (error: any) {
+//       vscode.window.showErrorMessage(`Erro ao listar arquivos: ${error.message ?? error}`);
+//     }
 
-    try {
-      const entries = await this.gitHubService.listDirectory(repository, folderPath);
-      const foldersOnly = entries.filter((entry) => entry.type === 'dir');
-      nodes.push(
-        ...foldersOnly.map((folder: GitHubFileEntry) => ({
-          type: 'folder' as const,
-          label: folder.name,
-          path: folder.path,
-          repository,
-        }))
-      );
-    } catch (error: any) {
-      // já tratado acima para markdown
-    }
+//     try {
+//       const entries = await this.gitHubService.listDirectory(repository, folderPath);
+//       const foldersOnly = entries.filter((entry) => entry.type === 'dir');
+//       nodes.push(
+//         ...foldersOnly.map((folder: GitHubFileEntry) => ({
+//           type: 'folder' as const,
+//           label: folder.name,
+//           path: folder.path,
+//           repository,
+//         }))
+//       );
+//     } catch (error: any) {
+//       // já tratado acima para markdown
+//     }
 
-    if (folderPath.endsWith('/plugins')) {
-      const basePath = folderPath.replace(/\/plugins$/, '');
-      try {
-        const marketplace = await this.gitHubService.findMarketplace(repository, basePath);
-        if (marketplace?.plugins?.length) {
-          nodes.push(
-            ...marketplace.plugins.map((plugin) => ({
-              type: 'plugin' as const,
-              label: plugin.name,
-              path: plugin.source,
-              repository,
-              plugin,
-            }))
-          );
-        }
-      } catch (error: any) {
-        vscode.window.showErrorMessage(`Erro ao carregar marketplace: ${error.message ?? error}`);
-      }
-    }
+//     if (folderPath.endsWith('/plugins')) {
+//       const basePath = folderPath.replace(/\/plugins$/, '');
+//       try {
+//         const marketplace = await this.gitHubService.findMarketplace(repository, basePath);
+//         if (marketplace?.plugins?.length) {
+//           nodes.push(
+//             ...marketplace.plugins.map((plugin) => ({
+//               type: 'plugin' as const,
+//               label: plugin.name,
+//               path: plugin.source,
+//               repository,
+//               plugin,
+//             }))
+//           );
+//         }
+//       } catch (error: any) {
+//         vscode.window.showErrorMessage(`Erro ao carregar marketplace: ${error.message ?? error}`);
+//       }
+//     }
 
-    return nodes;
-  }
+//     return nodes;
+//   }
 
-  private async getPluginChildren(repository: RepositoryNode, plugin: MarketplacePlugin): Promise<TreeNode[]> {
-    // Plugins não têm filhos adicionais; apenas ação de download.
-    return [];
-  }
+//   private async getPluginChildren(repository: RepositoryNode, plugin: MarketplacePlugin): Promise<TreeNode[]> {
+//     // Plugins não têm filhos adicionais; apenas ação de download.
+//     return [];
+//   }
 }

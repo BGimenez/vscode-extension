@@ -13,13 +13,9 @@
   "activationEvents": [
     "onView:emrDeveloperCortexViewer",
     "onCommand:emrDeveloperCortexViewer.refresh",
-    "onCommand:emrDeveloperCortexViewer.configureRepository",
-    "onCommand:emrDeveloperCortexViewer.configureBasePath",
-    "onCommand:emrDeveloperCortexViewer.configureDownloadPath",
-    "onCommand:emrDeveloperCortexViewer.listRepositories",
-    "onCommand:emrDeveloperCortexViewer.previewFile",
-    "onCommand:emrDeveloperCortexViewer.downloadFile",
-    "onCommand:emrDeveloperCortexViewer.downloadPlugin"
+    "onCommand:emrDeveloperCortexViewer.manageConfiguration",
+    "onCommand:emrDeveloperCortexViewer.configureToken",
+    "onCommand:emrDeveloperCortexViewer.viewRepositories"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -37,32 +33,16 @@
         "title": "EMR Developer Cortex: Refresh"
       },
       {
-        "command": "emrDeveloperCortexViewer.configureRepository",
+        "command": "emrDeveloperCortexViewer.manageConfiguration",
         "title": "EMR Developer Cortex: Configurar Repositórios"
       },
       {
-        "command": "emrDeveloperCortexViewer.configureBasePath",
+        "command": "emrDeveloperCortexViewer.configureToken",
         "title": "EMR Developer Cortex: Configurar Pasta Base"
       },
       {
-        "command": "emrDeveloperCortexViewer.configureDownloadPath",
+        "command": "emrDeveloperCortexViewer.viewRepositories",
         "title": "EMR Developer Cortex: Configurar Diretório de Download"
-      },
-      {
-        "command": "emrDeveloperCortexViewer.listRepositories",
-        "title": "EMR Developer Cortex: Listar Repositórios"
-      },
-      {
-        "command": "emrDeveloperCortexViewer.previewFile",
-        "title": "EMR Developer Cortex: Pré-visualizar Arquivo"
-      },
-      {
-        "command": "emrDeveloperCortexViewer.downloadFile",
-        "title": "EMR Developer Cortex: Baixar Arquivo"
-      },
-      {
-        "command": "emrDeveloperCortexViewer.downloadPlugin",
-        "title": "EMR Developer Cortex: Baixar Plugin"
       }
     ],
     "menus": {
@@ -92,13 +72,16 @@
     "configuration": {
       "title": "EMR Developer Cortex",
       "properties": {
-        "emrDeveloperCortexViewer.repositories": {
+        "cortex.repositories": {
           "type": "array",
           "default": [],
           "description": "Lista de repositórios configurados",
           "items": {
             "type": "object",
             "properties": {
+              "domain": {
+                "type": "string"
+              },
               "owner": {
                 "type": "string"
               },
@@ -108,10 +91,10 @@
               "token": {
                 "type": "string"
               },
-              "basePath": {
+              "label": {
                 "type": "string"
               },
-              "downloadPath": {
+              "path": {
                 "type": "string"
               }
             },

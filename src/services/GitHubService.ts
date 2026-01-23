@@ -22,17 +22,22 @@ export class GitHubService {
 			return [];
 		}
 
+		console.log('Repository contents response:', response);
+		
 		const marketplaceFile = response.find((item) => item.type === 'file' && item.name === 'marketplace.json');
+		console.log('Marketplace file found:', marketplaceFile);
 		
 		if (!marketplaceFile || !marketplaceFile.download_url) {
 			return [];
 		}
 
 		const marketplaceResponse = await this.httpClient.getByUrl(marketplaceFile.download_url, node.token);
+		console.log('Marketplace file response:', marketplaceResponse);
 		if (!marketplaceResponse) {
 			return [];
 		}
 		const marketplace: MarketplaceFile = parseMarketplace(marketplaceResponse, 'marketplace.json');
+		console.log('Parsed marketplace:', marketplace);
 		const collections = marketplace.collections?.map(collection => ({
 															name: collection.name,
 															path: collection.source,
@@ -43,6 +48,7 @@ export class GitHubService {
 															path: plugin.source,
 															type: 'dir',
 														}) as GitHubFileEntry) ?? [];
+		console.log('Marketplace collections and plugins:', { collections, plugins });
 		return [...collections, ...plugins];
 	}
 

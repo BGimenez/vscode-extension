@@ -54,7 +54,7 @@ export class CommandsActionVsCode implements CommandsAction {
 	}
 
 	async configureToken() {
-		const repositories = ConfigService.getRepositories();
+		const repositories = await ConfigService.getRepositories();
 		const repoSelected = await vscode.window.showQuickPick(
 			repositories.map((repo: any) => ({ label: `${repo.owner}/${repo.repo}`, source: repo })),
 			{ placeHolder: 'Select a repository to configure token' }
@@ -81,8 +81,8 @@ export class CommandsActionVsCode implements CommandsAction {
 		this.messageProvider.showInfo(`Token configured for ${repoSelected.label}.`);
 	}
 
-	viewRepositories() {
-		const repositories = ConfigService.getRepositories();
+	async viewRepositories() {
+		const repositories = await ConfigService.getRepositories();
 		if (repositories.length === 0) {
 			this.messageProvider.showInfo('No repositories configured.');
 		} else {

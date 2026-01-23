@@ -16,11 +16,14 @@ export class AxiosAdapter implements HttpClient {
 
 	async get(domain: string, owner: string, repo: string, path?: string, token?: string): Promise<any> {
 		const url = GitHubFormatter.formatUrl(domain, owner, repo, path);
+		console.log('Fetching URL:', url, token);
 		const headers = GitHubFormatter.getHeaders(token);
+		console.log('Using headers:', headers);
 		this.axiosConfig.headers = headers;
 		this.axiosConfig.withCredentials = !!token;
 		try {
 			const response = await axios.get(url, this.axiosConfig);
+			console.log('Received response:', response.data);
 			return response.data;
 		} catch (error) {
 			console.error(`Error fetching URL: ${url}`, error);
